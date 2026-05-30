@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#4facfe,#00f2fe);
+}
+
+.weather-container{
+    background:#fff;
+    width:400px;
+    padding:30px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+h1{
+    margin-bottom:20px;
+    color:#333;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+    margin-bottom:15px;
+}
+
+button{
+    padding:12px 25px;
+    border:none;
+    background:#007bff;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+#weatherResult{
+    margin-top:20px;
+}
+
+#weatherResult img{
+    width:80px;
+}
+
+.city{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.temp{
+    font-size:36px;
+    color:#007bff;
+    margin:10px 0;
+}
+
+.info{
+    margin:5px 0;
+    color:#555;
+}
+</style>
+
+</head>
+<body>
+
+<div class="weather-container">
+
+    <h1>🌤 Weather App</h1>
+
+    <input type="text" id="locationInput" placeholder="Enter City Name">
+
+    <button onclick="getWeather()">Check Weather</button>
+
+    <div id="weatherResult"></div>
+
+</div>
+
+<script>
+
+async function getWeather(){
+
+    const city = document.getElementById("locationInput").value.trim();
+    const result = document.getElementById("weatherResult");
+
+    if(city === ""){
+        result.innerHTML = "<p>Please enter a city name.</p>";
+        return;
+    }
+
+    const apiKey = "d1c1ad1dd1bc4350b9672721263005";
+
+    const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`;
+
+    result.innerHTML = "<p>Loading...</p>";
+
+    try{
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if(data.error){
+            result.innerHTML = `<p style="color:red;">${data.error.message}</p>`;
+            return;
+        }
+
+        result.innerHTML = `
+            <div class="city">
+                ${data.location.name}, ${data.location.country}
+            </div>
+
+            <img src="https:${data.current.condition.icon}" alt="Weather">
+
+            <div class="temp">
+                ${data.current.temp_c}°C
+            </div>
+
+            <div class="info">
+                ${data.current.condition.text}
+            </div>
+
+            <div class="info">
+                💧 Humidity: ${data.current.humidity}%
+            </div>
+
+            <div class="info">
+                🌬 Wind: ${data.current.wind_kph} km/h
+            </div>
+
+            <div class="info">
+                🕒 Local Time: ${data.location.localtime}
+            </div>
+        `;
+
+    }
+    catch(error){
+
+        result.innerHTML = `
+            <p style="color:red;">
+                Something went wrong. Please try again.
+            </p>
+        `;
+    }
+}
+
+</script>
+
+</body>
+</html>
